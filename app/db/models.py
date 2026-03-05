@@ -1,22 +1,29 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, CheckConstraint
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+    ForeignKey,
+    CheckConstraint,
+)
 from sqlalchemy.orm import relationship
-from app.db.db import Base
+from db.db import Base
 from datetime import datetime, timezone
 
 
 class User(Base):
-    __tablename__="user"
-    id=Column(Integer, primary_key=True)
-    username=Column(String, unique=True, nullable=False)
-    name=Column(String, nullable=False)
-    email=Column(String, unique=True)
-    password=Column(String)
-    game_user_bingos = relationship("GameUserBingo", back_populates="user")
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    code = Column(String, unique=True, nullable=False)
 
+    game_user_bingo = relationship("GameUserBingo", back_populates="user")
 
 class Game(Base):
     __tablename__ = "game"
-
     __table_args__ = (
         CheckConstraint("start_time < end_time", name="check_valid_time"),
     )
@@ -43,31 +50,23 @@ class Game(Base):
     
 
 class Bingo(Base):
-    __tablename__="bingo"
-    id=Column(Integer, primary_key=True)
-    row=Column(Integer, nullable=False)
-    col=Column(Integer, nullable=False)
-    bingo_char=Column(String, nullable=False)
-    image_link=Column(String, unique=True)
-    game_user_bingos = relationship("GameUserBingo", back_populates="bingo")
+    __tablename__ = "bingo"
+    id = Column(Integer, primary_key=True)
+    row = Column(Integer, nullable=False)
+    col = Column(Integer, nullable=False)
+    bingo_char = Column(String, nullable=False)
+    image_link = Column(String, unique=True)
+
+    game_user_bingo = relationship("GameUserBingo", back_populates="bingo")
 
 class GameUserBingo(Base):
     __tablename__ = "game_user_bingo"
 
-    game_id = Column(Integer, ForeignKey("game.id"), primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    bingo_id = Column(Integer, ForeignKey("bingo.id"), primary_key=True)
+    game_id = Column(ForeignKey("game.id"), primary_key=True)
+    user_id = Column(ForeignKey("user.id"), primary_key=True)
+    bingo_id = Column(ForeignKey("bingo.id"), primary_key=True)
+    points = Column(Integer, default=0)
 
-    game = relationship("Game", back_populates="game_user_bingos")
-    user = relationship("User", back_populates="game_user_bingos")
-    bingo = relationship("Bingo", back_populates="game_user_bingos")
-
-
-class GameParticipant(Base):
-    __tablename__ = "game_participant"
-
-    game_id = Column(Integer, ForeignKey("game.id"), primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    
-    game = relationship("Game")
-    user = relationship("User")
+    game = relationship("Game", back_populates="game_user_bingo")
+    user = relationship("User", back_populates="game_user_bingo")
+    bingo = relationship("Bingo", back_populates="game_user_bingo")
