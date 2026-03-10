@@ -42,18 +42,18 @@ class Game(Base):
 
     code = Column(String(6), unique=True, nullable=False)
 
-    size = Column(Integer, nullable=False)
+    board_size = Column(Integer, nullable=False)
 
     qr_img = Column(Text, nullable=True)
 
     game_user_bingos = relationship("GameUserBingo", back_populates="game")
 
 
-class Bingo(Base):
+class BingoTiles(Base):
     __tablename__ = "bingo"
     id = Column(Integer, primary_key=True)
-    row = Column(Integer, nullable=False)
-    col = Column(Integer, nullable=False)
+    row = Column(Integer, nullable=False, primary_key=True)
+    col = Column(Integer, nullable=False, primary_key=True)
     bingo_char = Column(String, nullable=False)
     image_link = Column(String, unique=True)
 
@@ -65,7 +65,7 @@ class GameUserBingo(Base):
 
     game_id = Column(ForeignKey("game.id"), primary_key=True)
     user_id = Column(ForeignKey("user.id"), primary_key=True)
-    bingo_id = Column(ForeignKey("bingo.id"), primary_key=True)
+    bingo_id = Column(ForeignKey("bingo.id"), primary_key=True, nullable=True)
     points = Column(Integer, default=0)
 
     game = relationship("Game", back_populates="game_user_bingo")
