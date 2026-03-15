@@ -34,9 +34,9 @@ class JoinGameResponse(BaseModel):
 class LobbyResponse(BaseModel):
     player_count: int
     players: list[str]
-    available_board_sizes: Literal[3,4,5]
+    available_board_sizes: list[Literal[3,4,5]]
 
 
 class StartGameResponse(BaseModel):
     message: str
-    board_size: int
+    board_size: Literal[3,4,5]
